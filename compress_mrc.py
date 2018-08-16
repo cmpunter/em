@@ -94,7 +94,7 @@ def process(path):
             compress(path)
     elif args.recursive and os.path.isdir(path):
         for filename in os.listdir(path):
-            compress(os.path.join(path, filename))
+            process(os.path.join(path, filename))
 
 
 for path in args.path:
