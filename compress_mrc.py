@@ -8,6 +8,8 @@ NOTE : the decompressed files are almost identical to the original with the foll
 - the following header fields are maintained: pixelsize, pixelunits, voltage, C3
 - the gain header field is not set in the mrcz file (limitation of the mrcz library code)
 
+2018-08-16
+- added support for mrcs files
 
 Rijksuniversiteit Groningen, 2018
 C.M. Punter (c.m.punter@rug.nl)
@@ -32,7 +34,10 @@ args = parser.parse_args()
 def compress(path):
     global args
 
-    mrcz_path = path[:-4] + '.mrcz'
+    if path.endswith('.mrc'):
+        mrcz_path = path[:-4] + '.mrcz'
+    elif path.endswith('.mrcs'):
+        mrcz_path = path[:-5] + '.mrczs'
 
     if args.verbose:
         print('compress %s -> %s' % (path, mrcz_path))
@@ -53,14 +58,17 @@ def compress(path):
     if args.delete:
         if args.verbose:
             print('delete %s' % (path))
-        if not args.dry_run:
+        if not args.dry_run and os.path.exists(mrcz_path):
             os.remove(path)
 
 
 def extract(path):
     global args
 
-    mrc_path = path[:-5] + '.mrc'
+    if path.endswith('.mrcz'):
+        mrc_path = path[:-5] + '.mrc'
+    elif path.endswith('.mrczs'):
+        mrc_path = path[:-6] + '.mrcs'
 
     if args.verbose:
         print('extract %s -> %s' % (path, mrc_path))
@@ -80,7 +88,7 @@ def extract(path):
     if args.delete:
         if args.verbose:
             print('delete %s' % (path))
-        if not args.dry_run:
+        if not args.dry_run and os.path.exists(mrc_path) and os.path.getsize(mrcz_path) > 0:
             os.remove(path)
 
 
@@ -88,9 +96,9 @@ def process(path):
     global args
 
     if os.path.isfile(path):
-        if args.extract and path.endswith('.mrcz'):
+        if args.extract and (path.endswith('.mrcz') or path.endswith('.mrczs')):
             extract(path)
-        elif path.endswith('.mrc'):
+        elif path.endswith('.mrc') or path.endswith('.mrcs'):
             compress(path)
     elif args.recursive and os.path.isdir(path):
         for filename in os.listdir(path):
