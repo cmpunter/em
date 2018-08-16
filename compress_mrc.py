@@ -8,8 +8,6 @@ NOTE : the decompressed files are almost identical to the original with the foll
 - the following header fields are maintained: pixelsize, pixelunits, voltage, C3
 - the gain header field is not set in the mrcz file (limitation of the mrcz library code)
 
-2018-08-16
-- added support for mrcs files
 
 Rijksuniversiteit Groningen, 2018
 C.M. Punter (c.m.punter@rug.nl)
@@ -58,7 +56,7 @@ def compress(path):
     if args.delete:
         if args.verbose:
             print('delete %s' % (path))
-        if not args.dry_run and os.path.exists(mrcz_path):
+        if not args.dry_run and os.path.exists(mrcz_path) and os.path.getsize(mrcz_path) > 0:
             os.remove(path)
 
 
@@ -88,7 +86,7 @@ def extract(path):
     if args.delete:
         if args.verbose:
             print('delete %s' % (path))
-        if not args.dry_run and os.path.exists(mrc_path) and os.path.getsize(mrcz_path) > 0:
+        if not args.dry_run and os.path.exists(mrc_path) and os.path.getsize(mrc_path) > 0:
             os.remove(path)
 
 
