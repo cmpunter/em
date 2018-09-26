@@ -49,7 +49,7 @@ def compress(path):
 
         if args.verbose:
             compressed_size = os.path.getsize(mrcz_path)
-            ratio = original_size / compressed_size
+            ratio = float(original_size) / compressed_size
             print('%20s : %d bytes' % ('compressed size', compressed_size))
             print('%20s : %.2f' % ('compression ratio', ratio))
 
@@ -79,7 +79,7 @@ def extract(path):
 
         if args.verbose:
             uncompressed_size = os.path.getsize(mrc_path)
-            ratio = uncompressed_size / compressed_size
+            ratio = float(uncompressed_size) / compressed_size
             print('%20s : %d bytes' % ('uncompressed size', uncompressed_size))
             print('%20s : %.2f' % ('compression ratio', ratio))
 
