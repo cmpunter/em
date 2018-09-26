@@ -96,7 +96,7 @@ def process(path):
     if os.path.isfile(path):
         if args.extract and (path.endswith('.mrcz') or path.endswith('.mrczs')):
             extract(path)
-        elif path.endswith('.mrc') or path.endswith('.mrcs'):
+        elif not args.extract and (path.endswith('.mrc') or path.endswith('.mrcs')):
             compress(path)
     elif args.recursive and os.path.isdir(path):
         for filename in os.listdir(path):
