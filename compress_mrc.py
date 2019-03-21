@@ -17,6 +17,7 @@ C.M. Punter (c.m.punter@rug.nl)
 import argparse
 import mrcz
 import os
+import time
 
 
 parser = argparse.ArgumentParser(description='Compress MRC files to the MRCZ format while keeping most of the header information')
@@ -25,6 +26,8 @@ parser.add_argument('-r', '--recursive', help='recursively go through all sub-di
 parser.add_argument('-v', '--verbose', help='verbose', action='store_true')
 parser.add_argument('-d', '--delete', help='delete the original mrc(z) files after writing/reading mrc(z) files', action='store_true')
 parser.add_argument('-x', '--extract', help='extract/decompress all mrcz files', action='store_true')
+parser.add_argument('-t', '--time', type=int, help='the amount of time in minutes that files have not been modified before they are co
+mpressed/extracted')
 parser.add_argument('-n', '--dry-run', help='dry run', action='store_true')
 args = parser.parse_args()
 
@@ -68,28 +71,32 @@ def extract(path):
     elif path.endswith('.mrczs'):
         mrc_path = path[:-6] + '.mrcs'
 
-    if args.verbose:
-        print('extract %s -> %s' % (path, mrc_path))
-        compressed_size = os.path.getsize(path)
-        print('%20s : %d bytes' % ('compressed size', compressed_size))
+    time_last_modified = os.path.getmtime(path)
+    time_since = (time.time() - time_last_modified) / 60    # in minutes
 
-    if not args.dry_run:
-        imageData, imageMeta = mrcz.readMRC(path)
-        mrcz.writeMRC(imageData, mrc_path, compressor=None, pixelsize=imageMeta['pixelsize'], pixelunits=imageMeta['pixelunits'], voltage=imageMeta['voltage'], C3=imageMeta['C3'], gain=imageMeta['gain'])
-
+    if time_since > args.time:
         if args.verbose:
-            uncompressed_size = os.path.getsize(mrc_path)
-            ratio = float(uncompressed_size) / compressed_size
-            print('%20s : %d bytes' % ('uncompressed size', uncompressed_size))
-            print('%20s : %.2f' % ('compression ratio', ratio))
+            print('extract %s -> %s' % (path, mrc_path))
+            compressed_size = os.path.getsize(path)
+            print('%20s : %d bytes' % ('compressed size', compressed_size))
 
-    if args.delete:
-        if args.verbose:
-            print('delete %s' % (path))
-        if not args.dry_run and os.path.exists(mrc_path) and os.path.getsize(mrc_path) > 0:
-            os.remove(path)
+        if not args.dry_run:
+            imageData, imageMeta = mrcz.readMRC(path)
+            mrcz.writeMRC(imageData, mrc_path, compressor=None, pixelsize=imageMeta['pixelsize'], pixelunits=imageMeta['pixelunits'], voltage=imageMeta['voltage'], C3=imageMeta['C3'], gain=imageMeta['gain'])
 
+            if args.verbose:
+                uncompressed_size = os.path.getsize(mrc_path)
+                ratio = float(uncompressed_size) / compressed_size
+                print('%20s : %d bytes' % ('uncompressed size', uncompressed_size))
+                print('%20s : %.2f' % ('compression ratio', ratio))
 
+        if args.delete:
+            if args.verbose:
+                print('delete %s' % (path))
+            if not args.dry_run and os.path.exists(mrc_path) and os.path.getsize(mrc_path) > 0:
+                os.remove(path)
+
+                    
 def process(path):
     global args
 
