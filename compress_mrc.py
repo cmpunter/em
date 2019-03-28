@@ -26,8 +26,7 @@ parser.add_argument('-r', '--recursive', help='recursively go through all sub-di
 parser.add_argument('-v', '--verbose', help='verbose', action='store_true')
 parser.add_argument('-d', '--delete', help='delete the original mrc(z) files after writing/reading mrc(z) files', action='store_true')
 parser.add_argument('-x', '--extract', help='extract/decompress all mrcz files', action='store_true')
-parser.add_argument('-t', '--time', type=int, help='the amount of time in minutes that files have not been modified before they are co
-mpressed/extracted')
+parser.add_argument('-t', '--time', type=int, help='the amount of time in minutes that files have not been modified before they are compressed/extracted')
 parser.add_argument('-n', '--dry-run', help='dry run', action='store_true')
 args = parser.parse_args()
 
@@ -117,5 +116,6 @@ for path in args.path:
                 process(os.path.join(path, filename))
         elif os.path.isfile(path):
             process(path)
-    except:
+    except Exception as e:
         print('could not process %s' % path)
+        print(e.message)
