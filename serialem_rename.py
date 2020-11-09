@@ -33,7 +33,7 @@ parser.add_argument("destination", help="destination directory")
 parser.add_argument("--time", type=int, help="number of minutes a file should be untouched before renaming/moving", default=2)
 parser.add_argument("--dry-run", action="store_const", const=True, help="dry run; no renaming/copying will occur")
 parser.add_argument("-c", "--copy", action="store_const", const=True, help="files are copied instead of moved")
-parser.add_argument("-s", "--super-resolution", action="store_const", const=True, help="run alterheader after renaming/moving")
+parser.add_argument("-s", "--super-resolution", action="store_const", const=True, help="run alterheader on mrc files after renaming/moving")
 parser.add_argument("-m", "--mdoc", action="store_const", const=True, help="also rename mdoc files")
 args = parser.parse_args()
 
@@ -71,7 +71,7 @@ for filename in os.listdir(args.source):
             if args.mdoc:
               shutil.move(old_path + ".mdoc", new_path + ".mdoc")
 
-          if args.super_resolution:
+          if args.super_resolution and not new_path.endswith(".tif"):
             os.system("alterheader %s -4bit 1" % new_path)
 
 
